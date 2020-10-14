@@ -63,23 +63,29 @@ void ACPP_CaravanPawn::MoveForwardByTick(float DeltaSeconds)
 void ACPP_CaravanPawn::TraceBoxObstacleDetection()
 {
 	
-
+	// Using the Sweep with Collision Shape to respect the boundaries of Pawn
+	// Also can be done via UKismetSystemLibrary::BoxTraceByChannel; Probably that was better idea...
 	ObstacleDetected = GetWorld()->SweepSingleByChannel(TraceResults, ArrowComponent->GetComponentLocation(),
                 ArrowComponent->GetComponentLocation() + (ArrowComponent->GetForwardVector() * SpottingDistance),
                 GetActorRotation().Quaternion(),ECC_Visibility,
                 BoundBox->GetCollisionShape());
 
+	
+	
 	if(ObstacleDetected)
 	{
+		// If obstacle is detected, then its not avoided, figures?
 		ObstacleAvoided = false;
 
 		// Printing out that caravan detects obstacle!
-		
+
+		/*
 		if(GEngine) 
 			GEngine->AddOnScreenDebugMessage(
                 -1, 0.1f, FColor::Yellow,
                 FString::Printf(TEXT("Obstacle! - %d"), TraceResults.IsValidBlockingHit())
             );
+        */
         
 	}
 	
@@ -89,7 +95,7 @@ void ACPP_CaravanPawn::TraceBoxObstacleDetection()
 void ACPP_CaravanPawn::SmoothRotateToTarget(float DeltaTime, FVector TargetLocation)
 {
 	SetActorRotation(
-		
+		// Using RInterpTo for a nice smooth turn
 		FMath::RInterpTo(
 			GetActorRotation(),
 			UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetLocation),
@@ -103,6 +109,7 @@ void ACPP_CaravanPawn::SmoothRotateToTarget(float DeltaTime, FVector TargetLocat
 
 void ACPP_CaravanPawn::TurnByTick(float DeltaTime)
 {
+	// Controller will handle RandomTurn multiplier.
 	AddActorLocalRotation(FRotator(0,TurningRate * DeltaTime * RandomTurn, 0));
 }
 
